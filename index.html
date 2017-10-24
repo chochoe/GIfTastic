@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy API</title>
+</head>
+
+<body>
+  <div class="container">
+    <div id="items-view"></div>
+    <form id="item-form">
+      <label for="item-input">Type Something In</label>
+      <input type="text" id="item-input"><br><br>
+      <input id="add-item" type="submit" value="Submit">
+    </form>
+    <div id="gif-me"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+      var topics = ["driving", "emojis", "dogs", "faceplant", "fails"];
+
+      // link buttons to correct images
+      // have 10 images per search term
+      // get click function on images to turn animations on and off
+      // hide images and show only when search term buttons are clicked
+      function displayInfo() {
+
+      	var item = $(this).attr("data-name");
+      	var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topics + "&api_key=dc6zaTOxFJmzC&limit=10";
+      	$.ajax({
+        	url: queryURL,
+        	method: 'GET',
+      	}).done(function(response) {
+      		var results = response.data;
+      		for (var i = 0; i < results.length; i++) {
+      			var itemDiv = $("<div>");
+
+              	var rating = results[i].rating;
+
+              	var p = $("<p>").text("Rating: " + rating);
+
+              	var itemImage = $("<img>");
+
+              	itemImage.attr("src", results[i].images.fixed_height.url);
+
+              	itemDiv.append(p);
+              	itemDiv.append(itemImage);
+
+              	$("#gif-me").prepend(itemDiv);
+            }
+        }); 
+      }
+
+      function renderButtons() {
+        $("#items-view").empty();
+        for (var i = 0; i < topics.length; i++) {
+          var newButton = $("<button>");
+          newButton.addClass("item");
+          newButton.attr("data-name", topics[i]);
+          newButton.text(topics[i]);
+          $("#items-view").append(newButton);
+        }
+      }
+
+      $("#add-item").on("click", function(event){
+      	event.preventDefault();
+      	var item = $("#item-input").val().trim();
+      	topics.push(item);
+      	renderButtons();
+      });
+
+      $(document).on("click", "item", displayInfo);
+      displayInfo();
+      renderButtons();
+
+
+    </script>
+  </div>
+
+</body>
+
+</html>
